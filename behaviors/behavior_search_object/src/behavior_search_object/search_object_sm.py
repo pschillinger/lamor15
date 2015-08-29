@@ -46,7 +46,7 @@ class SearchObjectSM(Behavior):
 
 	def create(self):
 		pcl_topic = '/camera/depth_registered/points'
-		object_name = 'tea_box'
+		object_name = 'teabox'
 		# x:183 y:440, x:383 y:190
 		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'])
 		_state_machine.userdata.text_found = 'I found %s' % object_name
