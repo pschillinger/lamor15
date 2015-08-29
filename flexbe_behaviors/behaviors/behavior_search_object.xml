@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="Search Object">
+
+	<executable package_path="behavior_search_object.search_object_sm" class="SearchObjectSM" />
+	<tagstring>search</tagstring>
+	<author>Philipp Schillinger</author>
+	<date>Sat Aug 29 2015</date>
+	<description>
+		Looks for an object at the current waypoint.
+	</description>
+
+
+	<!-- Contained Behaviors -->
+
+	<!-- Available Parameters -->
+
+</behavior>
