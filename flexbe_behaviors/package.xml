@@ -15,5 +15,6 @@
   <run_depend>behavior_example_behavior</run_depend>
   <run_depend>vigir_behavior_sweep_test_behavior</run_depend>
   <run_depend>behavior_search_object</run_depend>
+  <run_depend>behavior_tell_random_joke</run_depend>
 
 </package>
