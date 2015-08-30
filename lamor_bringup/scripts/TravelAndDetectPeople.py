@@ -80,13 +80,18 @@ class TravelAndDetectPeople(RobotRoutine):
         """
             Called when the routine is idle. Default is to trigger travel to the charging. As idleness is determined by the current schedule, if this call doesn't utlimately cause a task schedule to be generated this will be called repeatedly.
         """
+
+        if not waypoints: 
+            waypoints = self.get_nodes()
+
+	self.find_nearby_nodes(waypoints)
         if not isinstance(self.random_nodes, list):
             self.random_nodes = list(self.random_nodes)
 
         rospy.loginfo('Idle for too long, generating a random waypoint task')
         self.add_tasks([self.create_travel_task(random.choice(self.random_nodes))])
     
-    def create_travel_task(self, waypoint_name, max_duration=rospy.Duration(30)):
+    def create_travel_task(self, waypoint_name, max_duration=rospy.Duration(60)):
 	# Task: robot travels to waypoint
 	# 
 	task = Task()
@@ -107,4 +112,23 @@ class TravelAndDetectPeople(RobotRoutine):
 	task.start_node_id = waypoint_name
 	task.end_node_id = waypoint_name
         return task
+
+    def find_nearby_nodes(self, waypoints):
+	# need curpos
+	# need num
+	currpos = self.closest_node()
+	print currpos
+	return
+	num = 5
+        expected_time = rospy.ServiceProxy('topological_navigation/travel_time_estimator', EstimateTravelTime)        
+
+        times = []
+        for node in waypoints:
+		if start != currpos:
+		    et = expected_time(start=currpos, target=node).travel_time
+		    times.append(et)
+
+	times.sort()
+	nearby_times = times[:num]
+        return nearby_times
 
