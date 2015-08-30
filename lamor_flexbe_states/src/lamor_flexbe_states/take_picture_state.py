@@ -13,24 +13,19 @@ class TakePictureState(EventState):
 	'''
 	Stores the picture  of the given topic.
 
-	#> Image 	Image		The received pointcloud.
+	#> Image     Image        The received pointcloud.
 
-	<= done 			The picture has been received and stored.
+	<= done             The picture has been received and stored.
 
 	'''
 
 	def __init__(self):
-		super(TakePictureState, self).__init__(outcomes = ['done'],	output_keys = ['Image'])
-                self._topic = '/head_xtion/rgb/image_rect'
+		super(TakePictureState, self).__init__(outcomes = ['done'],    output_keys = ['Image'])
+		self._topic = '/head_xtion/rgb/image_rect_color'
 		self._sub = ProxySubscriberCached({self._topic:Image})
-
-
+	
+	
 	def execute(self, userdata):
-		
 		if self._sub.has_msg(self._topic):
 			userdata.Image = self._sub.get_last_msg(self._topic)
-			return 'done'
-		
-
-	
-		
+		return 'done'
