@@ -88,10 +88,10 @@ class TravelAndDetectPeople(RobotRoutine):
         return max_time
 
     def create_detection_routine(self, waypoints=None, daily_start=None, daily_end=None, repeat_delta=None):
-
-        tasks = self.create_interaction_task()
-	repeat_delta = timedelta(minutes=1)
-        self.create_task_routine(tasks=[tasks], daily_start=daily_start, daily_end=daily_end, repeat_delta=repeat_delta)
+	pass
+        #tasks = self.create_interaction_task()
+	#repeat_delta = timedelta(minutes=1)
+        #self.create_task_routine(tasks=[tasks], daily_start=daily_start, daily_end=daily_end, repeat_delta=repeat_delta)
 
     def create_routine(self):
         
@@ -107,7 +107,7 @@ class TravelAndDetectPeople(RobotRoutine):
         rospy.loginfo('Idle for too long, generating a random waypoint task')
         self.add_tasks([self.create_travel_task(random.choice(nearby_nodes))])
     
-    def create_travel_task(self, waypoint_name, max_duration=rospy.Duration(60)):
+    def create_travel_task(self, waypoint_name, max_duration=rospy.Duration(120)):
 	# Task: robot travels to waypoint
 	# 
 	task = Task()
@@ -118,14 +118,14 @@ class TravelAndDetectPeople(RobotRoutine):
 	task.end_node_id = waypoint_name
         return task
 
-    def create_interaction_task(self, max_duration=rospy.Duration(120)):
+    def create_interaction_task(self, waypoint_name, max_duration=rospy.Duration(120)):
 	# Task: robot detects human and interacts
 	task = Task()
 	task.action = '/flexbe/execute_behavior'
 	task_utils.add_string_argument(task,'Tell Random Joke')
 	task.max_duration = max_duration
-	#task.start_node_id = waypoint_name
-	#task.end_node_id = waypoint_name
+	task.start_node_id = waypoint_name
+	task.end_node_id = waypoint_name
         return task
 
     def find_nearby_nodes(self, waypoints=None):
