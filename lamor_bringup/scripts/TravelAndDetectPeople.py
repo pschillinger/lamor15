@@ -111,8 +111,8 @@ class TravelAndDetectPeople(RobotRoutine):
 	# Task: robot travels to waypoint
 	# 
 	task = Task()
-	#task.action = '/flexbe/execute_behavior'
-	#task_utils.add_string_argument(task,'Tell Random Joke')
+	task.action = '/flexbe/execute_behavior'
+	task_utils.add_string_argument(task,'Tell Random Joke')
 	task.max_duration = max_duration
 	task.start_node_id = waypoint_name
 	task.end_node_id = waypoint_name
@@ -122,7 +122,7 @@ class TravelAndDetectPeople(RobotRoutine):
 	# Task: robot detects human and interacts
 	task = Task()
 	task.action = '/flexbe/execute_behavior'
-	task_utils.add_string_argument(task,'Example Behavior')
+	task_utils.add_string_argument(task,'Tell Random Joke')
 	task.max_duration = max_duration
 	#task.start_node_id = waypoint_name
 	#task.end_node_id = waypoint_name
