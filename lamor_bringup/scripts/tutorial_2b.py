@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
-from TravelRoutine import TravelRoutine
+#from TravelRoutine import TravelRoutine
 from TravelAndRecognizeRoutine import TravelAndRecognizeRoutine
 
 from routine_behaviours.robot_routine import RobotRoutine
