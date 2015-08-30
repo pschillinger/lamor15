@@ -3,6 +3,7 @@
 import rospy
 #from TravelRoutine import TravelRoutine
 from TravelAndRecognizeRoutine import TravelAndRecognizeRoutine
+from TravelAndDetectPeople import TravelAndDetectPeople
 
 from routine_behaviours.robot_routine import RobotRoutine
 
@@ -66,7 +67,8 @@ if __name__ == '__main__':
 
     #routine = ExampleRoutine(daily_start=start, daily_end=end, idle_duration=idle_duration)    
     #routine = TravelRoutine(daily_start=start, daily_end=end, idle_duration=idle_duration)   
-    routine = TravelAndRecognizeRoutine(daily_start=start, daily_end=end, idle_duration=idle_duration)   
+    #routine = TravelAndRecognizeRoutine(daily_start=start, daily_end=end, idle_duration=idle_duration)   
+    routine = TravelAndDetectPeople(daily_start=start, daily_end=end, idle_duration=idle_duration) 
 
     routine.create_routine()
 
