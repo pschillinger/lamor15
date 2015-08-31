@@ -1,17 +1,20 @@
 #include <cmath>
 
 #include "stalk/stalk_pose.h"
+#include <actionlib/client/simple_action_client.h>
 
 using namespace std;
 
-StalkPose::StalkPose(std::string name) :
+typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> Client;
+
+ApproachPerson::ApproachPerson(std::string name) :
     timeToBlink(0),
     timeToUnBlink(0),
     action_name_(name){
     init();
 }
 
-void StalkPose::init() {
+void ApproachPerson::init() {
 
     ros::NodeHandle n;
 
@@ -31,9 +34,8 @@ void StalkPose::init() {
 
     ROS_INFO("Creating stalking action server");
     as_ = new actionlib::SimpleActionServer<stalking::StalkPoseAction>(n, action_name_, false);
-    as_->registerGoalCallback(boost::bind(&StalkPose::goalCallback, this, n));
-    as_->registerPreemptCallback(boost::bind(&StalkPose::preemptCallback, this));
-
+    as_->registerGoalCallback(boost::bind(&ApproachPerson::goalCallback, this, n));
+    as_->registerPreemptCallback(boost::bind(&ApproachPerson::preemptCallback, this));
 
     // Create a publisher
     head_pose_pub = n.advertise<sensor_msgs::JointState>(head_pose_topic.c_str(), 10);
@@ -47,14 +49,14 @@ void StalkPose::init() {
     as_->start();
     ROS_INFO(" ...stalking server started!");
 
-    transform_thread = boost::thread(&StalkPose::transform, this);
+    transform_thread = boost::thread(&ApproachPerson::transform, this);
 }
 
 // Set the endtime for the new goal. 0 = indefinit
-void StalkPose::goalCallback(ros::NodeHandle &n) {
+void ApproachPerson::goalCallback(ros::NodeHandle &n) {
     goal_ = as_->acceptNewGoal();
     ROS_DEBUG_STREAM("Received goal:\n" << *goal_);
-    pose_array_sub = n.subscribe(goal_->topic_name.c_str(), 10, &StalkPose::callback, this);
+    pose_array_sub = n.subscribe(goal_->topic_name.c_str(), 10, &ApproachPerson::callback, this);
     end_time = goal_->runtime_sec > 0 ? ros::Time::now().toSec() + goal_->runtime_sec : 0.0;
 
     // Compute goal for robot (keep distance to person)
@@ -85,25 +87,26 @@ void StalkPose::goalCallback(ros::NodeHandle &n) {
         // Act only if we are far enough from the person
         move_base_msgs::MoveBaseGoal mb_goal;
         mb_goal.target_pose = target;
-        //mbc_->sendGoal(mb_goal, boost::bind(&StalkPose::MoveBaseDone, this, _1, _2));
-        mbc_->sendGoal(mb_goal);
+        mbc_->sendGoal(mb_goal, boost::bind(&ApproachPerson::MoveBaseDone, this, _1, _2),
+                       Client::SimpleActiveCallback(),
+                       Client::SimpleFeedbackCallback());
+        //mbc_->sendGoal(mb_goal);
     }
 }
  
 // Done callback for MoveBase
-/*
-void StalkPose::MoveBaseDone(const actionlib::SimpleClientGoalState& state,
-                            const boost::shared_ptr<move_base_msgs::MoveBaseResult>& result)
+
+void ApproachPerson::MoveBaseDone(const actionlib::SimpleClientGoalState& state,
+                             const move_base_msgs::MoveBaseResultConstPtr &result)
 {
     //TODO: should actually parse the result!
     result_.success = true;
     as_->setSucceeded(result_);
     pose_array_sub.shutdown();
 }
-*/
 
 // Cancel current goal
-void StalkPose::preemptCallback() {
+void ApproachPerson::preemptCallback() {
     ROS_DEBUG("%s: Preempted", action_name_.c_str());
 
     // set the action state to preempted
@@ -118,7 +121,7 @@ void StalkPose::preemptCallback() {
     //resetHead();
 }
 
-void StalkPose::resetHead() {
+void ApproachPerson::resetHead() {
     // Publish a zero position to reset the head
     sensor_msgs::JointState state;
     state.header.frame_id = "/head_base_frame";
@@ -138,14 +141,14 @@ void StalkPose::resetHead() {
 }
 
 //Give feedback about the currently gazed at pose and the remaining run time.
-void inline StalkPose::feedback(geometry_msgs::Pose pose) {
+void inline ApproachPerson::feedback(geometry_msgs::Pose pose) {
     feedback_.target = pose;
     feedback_.remaining_time = end_time > 0 ? end_time - ros::Time::now().toSec() : INFINITY;
     as_->publishFeedback(feedback_);
 }
 
 //Check if run time is up.
-void inline StalkPose::checkTime() {
+void inline ApproachPerson::checkTime() {
     if(ros::Time::now().toSec() > end_time && end_time > 0.0) {
         ROS_DEBUG("Execution time has been reached. Goal terminated successfully");
         result_.success = true;
@@ -155,7 +158,7 @@ void inline StalkPose::checkTime() {
     }
 }
 
-void StalkPose::transform() {
+void ApproachPerson::transform() {
     ros::Rate r(10);
     while(ros::ok()) {
         if(as_->isActive()) {
@@ -202,18 +205,18 @@ void StalkPose::transform() {
     }
 }
 
-void StalkPose::setPose(const geometry_msgs::PoseStamped::ConstPtr &msg) {
+void ApproachPerson::setPose(const geometry_msgs::PoseStamped::ConstPtr &msg) {
     boost::lock_guard<boost::mutex> lock(mutex);
     pose = msg;
 }
 
-const geometry_msgs::PoseStamped::ConstPtr StalkPose::getPose() {
+const geometry_msgs::PoseStamped::ConstPtr ApproachPerson::getPose() {
     boost::lock_guard<boost::mutex> lock(mutex);
     return pose;
 }
 
 
-void StalkPose::callback(const geometry_msgs::PoseStamped::ConstPtr &msg)
+void ApproachPerson::callback(const geometry_msgs::PoseStamped::ConstPtr &msg)
 {
     if (!as_->isActive())
         return;
@@ -232,7 +235,7 @@ int main(int argc, char **argv)
     std::string action_name = "stalk_pose";
     ros::init(argc, argv, action_name.c_str());
 
-    StalkPose *gap = new StalkPose(action_name);
+    ApproachPerson *gap = new ApproachPerson(action_name);
 
     ros::spin();
     return 0;

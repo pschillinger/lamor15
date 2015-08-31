@@ -54,6 +54,7 @@ class TellRandomJokeSM(Behavior):
 	def create(self):
 		wait_timeout = 30 # seconds
 		max_approach_index = 8
+		tweet_template = '#LAMoR15 #ECMR15 I just told a joke: %s'
 		# x:705 y:482, x:130 y:365
 		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'])
 		_state_machine.userdata.approach_index = 0
@@ -108,7 +109,7 @@ class TellRandomJokeSM(Behavior):
 
 			# x:360 y:289
 			OperatableStateMachine.add('Append_Text',
-										CalculationState(calculation=lambda x: '#LAMoR15 I just told a joke: %s' % x),
+										CalculationState(calculation=lambda x: tweet_template % x),
 										transitions={'done': 'Tweet_Picture'},
 										autonomy={'done': Autonomy.Off},
 										remapping={'input_value': 'joke', 'output_value': 'tweet_text'})
@@ -141,7 +142,7 @@ class TellRandomJokeSM(Behavior):
 
 			# x:312 y:64
 			OperatableStateMachine.add('Adjust_Camera',
-										MoveCameraState(dishes_to_do=None),
+										MoveCameraState(),
 										transitions={'done': 'finished', 'failed': 'unable_to_approach'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'pan': 'pan', 'tilt': 'tilt'})
