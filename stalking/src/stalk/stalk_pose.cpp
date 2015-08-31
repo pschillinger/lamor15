@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "stalk/stalk_pose.h"
 
 using namespace std;
@@ -54,10 +56,38 @@ void StalkPose::goalCallback(ros::NodeHandle &n) {
     ROS_DEBUG_STREAM("Received goal:\n" << *goal_);
     pose_array_sub = n.subscribe(goal_->topic_name.c_str(), 10, &StalkPose::callback, this);
     end_time = goal_->runtime_sec > 0 ? ros::Time::now().toSec() + goal_->runtime_sec : 0.0;
-    move_base_msgs::MoveBaseGoal mb_goal;
-    mb_goal.target_pose = goal_->target;
-    //mbc_->sendGoal(mb_goal, boost::bind(&StalkPose::MoveBaseDone, this, _1, _2));
-    mbc_->sendGoal(mb_goal);
+
+    // Compute goal for robot (keep distance to person)
+    geometry_msgs::PoseStamped target = goal_->target;
+    geometry_msgs::PoseStamped robot = geometry_msgs::PoseStamped();
+    robot.header.frame_id = "base_footprint";
+    robot.pose.orientation.w = 1.0;
+    try {
+        // TODO: Remove hardcoded stuff!
+        ROS_DEBUG("Getting robot position.");
+        listener->waitForTransform("base_footprint", "map", ros::Time::now(), ros::Duration(3.0));
+        listener->transformPose("map", robot, robot);
+    }
+    catch(tf::TransformException ex) {
+        ROS_WARN("Failed transform: %s", ex.what());
+    }
+    double dx = target.pose.position.x - robot.pose.position.x;
+    double dy = target.pose.position.y - robot.pose.position.y;
+    double dist = sqrt(dx*dx + dy*dy);
+    double angle = atan2(dy,dx);
+    double dist_req = 0.7; // Required distance from person
+    if (dist > dist_req)
+    {
+        target.pose.position.x -= dist_req*cos(angle);
+        target.pose.position.y -= dist_req*sin(angle);
+        target.pose.orientation.w = cos(angle/2);
+        target.pose.orientation.z = sin(angle/2);
+        // Act only if we are far enough from the person
+        move_base_msgs::MoveBaseGoal mb_goal;
+        mb_goal.target_pose = target;
+        //mbc_->sendGoal(mb_goal, boost::bind(&StalkPose::MoveBaseDone, this, _1, _2));
+        mbc_->sendGoal(mb_goal);
+    }
 }
  
 // Done callback for MoveBase
