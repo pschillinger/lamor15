@@ -33,3 +33,5 @@ target:
 ```
 
 For further details consult the docs of the strands gazing package.
+
+WARNING: The action server behavior is incomplete! It only supports receiving goals. It does not provide feedback, and it never reports successful execution.
