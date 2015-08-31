@@ -13,7 +13,7 @@ RC.PubSub = new (function() {
 		disp.setAttribute('src', msg.data);
 		picdisplay = document.getElementById('picdisplay');
 		idledisplay = document.getElementById('idledisplay');
-		picdisplay.style.display = 'box';
+		picdisplay.style.display = 'block';
 		idledisplay.style.display = 'none';
 	}
 	
@@ -58,7 +58,7 @@ RC.PubSub = new (function() {
 		picdisplay = document.getElementById('picdisplay');
 		idledisplay = document.getElementById('idledisplay');
 		picdisplay.style.display = 'none';
-		idledisplay.style.display = 'box';
+		idledisplay.style.display = 'block';
 		disp = document.getElementById('imgdisplay');
 		disp.setAttribute('src', '');
 		frame = document.getElementById('twitterframe');
@@ -70,7 +70,7 @@ RC.PubSub = new (function() {
 		picdisplay = document.getElementById('picdisplay');
 		idledisplay = document.getElementById('idledisplay');
 		picdisplay.style.display = 'none';
-		idledisplay.style.display = 'box';
+		idledisplay.style.display = 'block';
 		disp = document.getElementById('imgdisplay');
 		disp.setAttribute('src', '');
 		frame = document.getElementById('twitterframe');
