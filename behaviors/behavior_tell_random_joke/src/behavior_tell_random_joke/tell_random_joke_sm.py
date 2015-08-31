@@ -18,6 +18,7 @@ from flexbe_states.wait_state import WaitState
 from lamor_flexbe_states.store_picture_state import StorePictureState
 from lamor_flexbe_states.take_picture_state import TakePictureState
 from lamor_flexbe_states.show_picture_webinterface_state import ShowPictureWebinterfaceState
+from lamor_flexbe_states.tweet_picture_state import TweetPictureState
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -66,7 +67,7 @@ class TellRandomJokeSM(Behavior):
 		# [/MANUAL_CREATE]
 
 		# x:121 y:471
-		_sm_take_a_picture_0 = OperatableStateMachine(outcomes=['finished'])
+		_sm_take_a_picture_0 = OperatableStateMachine(outcomes=['finished'], input_keys=['joke'])
 
 		with _sm_take_a_picture_0:
 			# x:91 y:28
@@ -92,9 +93,23 @@ class TellRandomJokeSM(Behavior):
 			# x:68 y:328
 			OperatableStateMachine.add('Show_Picture',
 										ShowPictureWebinterfaceState(),
-										transitions={'tweet': 'finished', 'forget': 'finished'},
+										transitions={'tweet': 'Append_Text', 'forget': 'finished'},
 										autonomy={'tweet': Autonomy.Off, 'forget': Autonomy.Off},
 										remapping={'image_name': 'image_name'})
+
+			# x:324 y:428
+			OperatableStateMachine.add('Tweet_Picture',
+										TweetPictureState(),
+										transitions={'picture_tweeted': 'finished', 'tweeting_failed': 'finished', 'command_error': 'finished'},
+										autonomy={'picture_tweeted': Autonomy.Off, 'tweeting_failed': Autonomy.Off, 'command_error': Autonomy.Off},
+										remapping={'picture_path': 'image_name', 'tweet_text': 'tweet_text'})
+
+			# x:360 y:289
+			OperatableStateMachine.add('Append_Text',
+										CalculationState(calculation=lambda x: '#LAMoR15 I just told a joke: %s' % x),
+										transitions={'done': 'Tweet_Picture'},
+										autonomy={'done': Autonomy.Off},
+										remapping={'input_value': 'joke', 'output_value': 'tweet_text'})
 
 
 		# x:282 y:234, x:733 y:240, x:128 y:248
@@ -171,7 +186,8 @@ class TellRandomJokeSM(Behavior):
 			OperatableStateMachine.add('Take_A_Picture',
 										_sm_take_a_picture_0,
 										transitions={'finished': 'Say_Come_Around'},
-										autonomy={'finished': Autonomy.Inherit})
+										autonomy={'finished': Autonomy.Inherit},
+										remapping={'joke': 'joke'})
 
 
 		return _state_machine
