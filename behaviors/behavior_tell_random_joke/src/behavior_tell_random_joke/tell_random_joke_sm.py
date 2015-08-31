@@ -11,12 +11,13 @@ from flexbe_core import Behavior, Autonomy, OperatableStateMachine, Logger
 from lamor_flexbe_states.detect_person_state import DetectPersonState
 from flexbe_states.calculation_state import CalculationState
 from flexbe_states.decision_state import DecisionState
+from lamor_flexbe_states.approach_person_state import ApproachPersonState
 from lamor_flexbe_states.speech_output_state import SpeechOutputState
 from lamor_flexbe_states.pick_joke_state import PickJokeState
-from lamor_flexbe_states.take_picture_state import TakePictureState
-from lamor_flexbe_states.store_picture_state import StorePictureState
 from flexbe_states.wait_state import WaitState
+from lamor_flexbe_states.store_picture_state import StorePictureState
 from lamor_flexbe_states.display_picture_state import DisplayPictureState
+from lamor_flexbe_states.take_picture_state import TakePictureState
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -96,14 +97,14 @@ class TellRandomJokeSM(Behavior):
 										remapping={'Image': 'Image'})
 
 
-		# x:282 y:234, x:733 y:240, x:128 y:234
+		# x:282 y:234, x:733 y:240, x:128 y:248
 		_sm_approach_person_1 = OperatableStateMachine(outcomes=['finished', 'unable_to_approach', 'no_person'], input_keys=['approach_index'])
 
 		with _sm_approach_person_1:
 			# x:92 y:78
 			OperatableStateMachine.add('Check_For_Person',
 										DetectPersonState(wait_timeout=wait_timeout),
-										transitions={'detected': 'Dummy_Approach', 'not_detected': 'no_person'},
+										transitions={'detected': 'Approach_Person', 'not_detected': 'no_person'},
 										autonomy={'detected': Autonomy.Off, 'not_detected': Autonomy.Off},
 										remapping={'person_pose': 'person_pose'})
 
@@ -117,16 +118,16 @@ class TellRandomJokeSM(Behavior):
 			# x:609 y:78
 			OperatableStateMachine.add('Check_If_Approach_Choice_Left',
 										DecisionState(outcomes=['try_next', 'unable'], conditions=lambda idx: 'unable' if idx > max_approach_index else 'try_next'),
-										transitions={'try_next': 'Dummy_Approach', 'unable': 'unable_to_approach'},
+										transitions={'try_next': 'Approach_Person', 'unable': 'unable_to_approach'},
 										autonomy={'try_next': Autonomy.Low, 'unable': Autonomy.High},
 										remapping={'input_value': 'approach_index'})
 
-			# x:293 y:78
-			OperatableStateMachine.add('Dummy_Approach',
-										DecisionState(outcomes=['approached', 'failed'], conditions=lambda x: 'approached' if x > 2 else 'failed'),
-										transitions={'approached': 'finished', 'failed': 'Increment_Index'},
-										autonomy={'approached': Autonomy.Off, 'failed': Autonomy.Off},
-										remapping={'input_value': 'approach_index'})
+			# x:279 y:63
+			OperatableStateMachine.add('Approach_Person',
+										ApproachPersonState(),
+										transitions={'goal_reached': 'finished', 'goal_failed': 'Increment_Index', 'command_error': 'Increment_Index'},
+										autonomy={'goal_reached': Autonomy.Off, 'goal_failed': Autonomy.Off, 'command_error': Autonomy.Off},
+										remapping={'person_pose': 'person_pose'})
 
 
 
