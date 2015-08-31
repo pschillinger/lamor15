@@ -113,7 +113,7 @@
   </include>
 
   <node name="odometry_mileage" pkg="odometry_mileage" type="odometry_mileage" respawn="true"/>
-  <!-- <node name="door_pass_node" pkg="door_pass" type="door_pass.py" output="screen" /> --> <!-- Might still be needed -->
+  <node name="door_pass_node" pkg="door_pass" type="door_passing.py" output="screen" />  <!-- Might still be needed -->
 
   <group if="$(arg with_human_aware)">
     <node name="gaze_at_pose" pkg="strands_gazing" type="gaze_at_pose" respawn="true"/>
