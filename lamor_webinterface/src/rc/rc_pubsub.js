@@ -62,7 +62,7 @@ RC.PubSub = new (function() {
 		disp = document.getElementById('imgdisplay');
 		disp.setAttribute('src', '');
 		frame = document.getElementById('twitterframe');
-		frame.setAttribute('data', 'file:///home/phil/catkin_ws/src/lamor15/lamor_webinterface/src/window.html');
+		frame.setAttribute('src', 'https://lcas.lincoln.ac.uk/ecmr15/');
 	}
 
 	this.sendDialogNo = function() {
@@ -74,7 +74,7 @@ RC.PubSub = new (function() {
 		disp = document.getElementById('imgdisplay');
 		disp.setAttribute('src', '');
 		frame = document.getElementById('twitterframe');
-		frame.setAttribute('data', 'file:///home/phil/catkin_ws/src/lamor15/lamor_webinterface/src/window.html');
+		frame.setAttribute('src', 'https://lcas.lincoln.ac.uk/ecmr15/');
 	}
 
 }) ();
