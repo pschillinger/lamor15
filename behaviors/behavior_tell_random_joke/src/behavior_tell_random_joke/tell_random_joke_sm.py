@@ -13,9 +13,9 @@ from lamor_flexbe_states.move_camera_state import MoveCameraState
 from lamor_flexbe_states.approach_person_state import ApproachPersonState
 from lamor_flexbe_states.take_picture_state import TakePictureState
 from lamor_flexbe_states.detect_face_state import DetectFaceState
+from flexbe_states.wait_state import WaitState
 from lamor_flexbe_states.speech_output_state import SpeechOutputState
 from lamor_flexbe_states.pick_joke_state import PickJokeState
-from flexbe_states.wait_state import WaitState
 from lamor_flexbe_states.store_picture_state import StorePictureState
 from lamor_flexbe_states.show_picture_webinterface_state import ShowPictureWebinterfaceState
 from lamor_flexbe_states.tweet_picture_state import TweetPictureState
@@ -166,9 +166,15 @@ class TellRandomJokeSM(Behavior):
 			# x:381 y:158
 			OperatableStateMachine.add('Check_For_Faces',
 										DetectFaceState(),
-										transitions={'face_is_detected': 'Approach_Person', 'face_is_not_detected': 'Check_For_Person'},
+										transitions={'face_is_detected': 'Approach_Person', 'face_is_not_detected': 'Wait_Briefly'},
 										autonomy={'face_is_detected': Autonomy.Off, 'face_is_not_detected': Autonomy.Off},
 										remapping={'Image': 'Image'})
+
+			# x:196 y:163
+			OperatableStateMachine.add('Wait_Briefly',
+										WaitState(wait_time=1),
+										transitions={'done': 'Check_For_Person'},
+										autonomy={'done': Autonomy.Off})
 
 
 
