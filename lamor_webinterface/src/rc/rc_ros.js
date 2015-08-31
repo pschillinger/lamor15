@@ -28,7 +28,7 @@ RC.ROS = new (function() {
 
 	var attemptToConnect = function() {
 		ros = new ROSLIB.Ros({
-			url : 'ws://localhost:9090'
+			url : 'ws://linda:8088'
 		});
 		ros.on('connection', setupConnection);
 		ros.on('error', function() {
