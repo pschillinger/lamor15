@@ -52,10 +52,11 @@ class TellRandomJokeSM(Behavior):
 	def create(self):
 		wait_timeout = 30 # seconds
 		max_approach_index = 8
-		# x:733 y:281, x:130 y:365
+		# x:705 y:482, x:130 y:365
 		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'])
 		_state_machine.userdata.approach_index = 0
 		_state_machine.userdata.text_too_far = "Sorry, I am unable to come closer! But I can tell you a joke!"
+		_state_machine.userdata.text_come_around = "I just took a picture of you. You can come around and take a look."
 
 		# Additional creation code can be added inside the following tags
 		# [MANUAL_CREATE]
@@ -125,25 +126,32 @@ class TellRandomJokeSM(Behavior):
 										autonomy={'done': Autonomy.Off},
 										remapping={'joke': 'joke'})
 
-			# x:667 y:111
+			# x:725 y:134
 			OperatableStateMachine.add('Take_Picture',
 										TakePictureState(),
 										transitions={'done': 'Store_Picture'},
 										autonomy={'done': Autonomy.Off},
 										remapping={'Image': 'Image'})
 
-			# x:686 y:211
+			# x:709 y:228
 			OperatableStateMachine.add('Store_Picture',
 										StorePictureState(),
-										transitions={'done': 'finished'},
+										transitions={'done': 'Say_Come_Around'},
 										autonomy={'done': Autonomy.Off},
 										remapping={'Image': 'Image'})
 
-			# x:643 y:28
+			# x:704 y:36
 			OperatableStateMachine.add('Wait_For_Laughing',
 										WaitState(wait_time=1),
 										transitions={'done': 'Take_Picture'},
 										autonomy={'done': Autonomy.Off})
+
+			# x:692 y:336
+			OperatableStateMachine.add('Say_Come_Around',
+										SpeechOutputState(),
+										transitions={'done': 'finished', 'failed': 'failed'},
+										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
+										remapping={'text': 'text_come_around'})
 
 
 		return _state_machine
