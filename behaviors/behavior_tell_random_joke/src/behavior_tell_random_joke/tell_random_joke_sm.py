@@ -11,11 +11,12 @@ from flexbe_core import Behavior, Autonomy, OperatableStateMachine, Logger
 from lamor_flexbe_states.detect_person_state import DetectPersonState
 from lamor_flexbe_states.move_camera_state import MoveCameraState
 from lamor_flexbe_states.approach_person_state import ApproachPersonState
+from lamor_flexbe_states.take_picture_state import TakePictureState
+from lamor_flexbe_states.detect_face_state import DetectFaceState
 from lamor_flexbe_states.speech_output_state import SpeechOutputState
 from lamor_flexbe_states.pick_joke_state import PickJokeState
 from flexbe_states.wait_state import WaitState
 from lamor_flexbe_states.store_picture_state import StorePictureState
-from lamor_flexbe_states.take_picture_state import TakePictureState
 from lamor_flexbe_states.show_picture_webinterface_state import ShowPictureWebinterfaceState
 from lamor_flexbe_states.tweet_picture_state import TweetPictureState
 from flexbe_states.calculation_state import CalculationState
@@ -130,30 +131,44 @@ class TellRandomJokeSM(Behavior):
 										remapping={'text': 'text_tweeted'})
 
 
-		# x:282 y:234, x:733 y:240, x:128 y:248
+		# x:392 y:544, x:922 y:602, x:128 y:248
 		_sm_approach_person_1 = OperatableStateMachine(outcomes=['finished', 'unable_to_approach', 'no_person'], input_keys=['approach_index', 'pan', 'tilt'])
 
 		with _sm_approach_person_1:
 			# x:92 y:78
 			OperatableStateMachine.add('Check_For_Person',
 										DetectPersonState(wait_timeout=wait_timeout),
-										transitions={'detected': 'Approach_Person', 'not_detected': 'no_person'},
+										transitions={'detected': 'Take_Picture', 'not_detected': 'no_person'},
 										autonomy={'detected': Autonomy.Off, 'not_detected': Autonomy.Off},
 										remapping={'person_pose': 'person_pose'})
 
-			# x:464 y:146
+			# x:563 y:394
 			OperatableStateMachine.add('Adjust_Camera',
 										MoveCameraState(),
 										transitions={'done': 'finished', 'failed': 'unable_to_approach'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'pan': 'pan', 'tilt': 'tilt'})
 
-			# x:300 y:55
+			# x:598 y:66
 			OperatableStateMachine.add('Approach_Person',
 										ApproachPersonState(),
 										transitions={'goal_reached': 'Adjust_Camera', 'goal_failed': 'Adjust_Camera', 'command_error': 'Adjust_Camera'},
 										autonomy={'goal_reached': Autonomy.Off, 'goal_failed': Autonomy.Off, 'command_error': Autonomy.Off},
 										remapping={'person_pose': 'person_pose'})
+
+			# x:363 y:39
+			OperatableStateMachine.add('Take_Picture',
+										TakePictureState(),
+										transitions={'done': 'Check_For_Faces'},
+										autonomy={'done': Autonomy.Off},
+										remapping={'Image': 'Image'})
+
+			# x:381 y:158
+			OperatableStateMachine.add('Check_For_Faces',
+										DetectFaceState(),
+										transitions={'face_is_detected': 'Approach_Person', 'face_is_not_detected': 'Check_For_Person'},
+										autonomy={'face_is_detected': Autonomy.Off, 'face_is_not_detected': Autonomy.Off},
+										remapping={'Image': 'Image'})
 
 
 
