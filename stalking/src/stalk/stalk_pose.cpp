@@ -90,6 +90,7 @@ void ApproachPerson::goalCallback(ros::NodeHandle &n) {
         mbc_->sendGoal(mb_goal, boost::bind(&ApproachPerson::MoveBaseDone, this, _1, _2),
                        Client::SimpleActiveCallback(),
                        Client::SimpleFeedbackCallback());
+        ROS_INFO_STREAM("approach person: sent goal: " << target);
         //mbc_->sendGoal(mb_goal);
     }
 }
@@ -100,6 +101,7 @@ void ApproachPerson::MoveBaseDone(const actionlib::SimpleClientGoalState& state,
                              const move_base_msgs::MoveBaseResultConstPtr &result)
 {
     //TODO: should actually parse the result!
+    ROS_INFO("approach person: move_base is done");
     result_.success = true;
     as_->setSucceeded(result_);
     pose_array_sub.shutdown();
@@ -107,7 +109,7 @@ void ApproachPerson::MoveBaseDone(const actionlib::SimpleClientGoalState& state,
 
 // Cancel current goal
 void ApproachPerson::preemptCallback() {
-    ROS_DEBUG("%s: Preempted", action_name_.c_str());
+    ROS_INFO("%s: Preempted", action_name_.c_str());
 
     // set the action state to preempted
     result_.success = false;
