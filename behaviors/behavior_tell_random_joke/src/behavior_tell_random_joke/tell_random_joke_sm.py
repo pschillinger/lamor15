@@ -13,6 +13,9 @@ from flexbe_states.calculation_state import CalculationState
 from flexbe_states.decision_state import DecisionState
 from lamor_flexbe_states.speech_output_state import SpeechOutputState
 from lamor_flexbe_states.pick_joke_state import PickJokeState
+from lamor_flexbe_states.take_picture_state import TakePictureState
+from lamor_flexbe_states.store_picture_state import StorePictureState
+from flexbe_states.wait_state import WaitState
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -49,7 +52,7 @@ class TellRandomJokeSM(Behavior):
 	def create(self):
 		wait_timeout = 30 # seconds
 		max_approach_index = 8
-		# x:733 y:240, x:130 y:365
+		# x:733 y:281, x:130 y:365
 		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'])
 		_state_machine.userdata.approach_index = 0
 		_state_machine.userdata.text_too_far = "Sorry, I am unable to come closer! But I can tell you a joke!"
@@ -104,7 +107,7 @@ class TellRandomJokeSM(Behavior):
 			# x:444 y:228
 			OperatableStateMachine.add('Tell_The_Joke',
 										SpeechOutputState(),
-										transitions={'done': 'finished', 'failed': 'failed'},
+										transitions={'done': 'Wait_For_Laughing', 'failed': 'failed'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.High},
 										remapping={'text': 'joke'})
 
@@ -121,6 +124,26 @@ class TellRandomJokeSM(Behavior):
 										transitions={'done': 'Tell_The_Joke'},
 										autonomy={'done': Autonomy.Off},
 										remapping={'joke': 'joke'})
+
+			# x:667 y:111
+			OperatableStateMachine.add('Take_Picture',
+										TakePictureState(),
+										transitions={'done': 'Store_Picture'},
+										autonomy={'done': Autonomy.Off},
+										remapping={'Image': 'Image'})
+
+			# x:686 y:211
+			OperatableStateMachine.add('Store_Picture',
+										StorePictureState(),
+										transitions={'done': 'finished'},
+										autonomy={'done': Autonomy.Off},
+										remapping={'Image': 'Image'})
+
+			# x:643 y:28
+			OperatableStateMachine.add('Wait_For_Laughing',
+										WaitState(wait_time=1),
+										transitions={'done': 'Take_Picture'},
+										autonomy={'done': Autonomy.Off})
 
 
 		return _state_machine
