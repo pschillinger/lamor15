@@ -17,16 +17,16 @@
 
 #include <boost/thread.hpp>
 
-class StalkPose
+class ApproachPerson
 {
 public:
-    StalkPose(std::string name);
-    ~StalkPose();
+    ApproachPerson(std::string name);
+    ~ApproachPerson();
     void callback(const geometry_msgs::PoseStamped::ConstPtr &msg);
     void goalCallback(ros::NodeHandle &n);
     void preemptCallback();
     void MoveBaseDone(const actionlib::SimpleClientGoalState& state,
-                      const boost::shared_ptr<move_base_msgs::MoveBaseResult>& result);
+                      const move_base_msgs::MoveBaseResultConstPtr &result);
 
 private:
     void init();
