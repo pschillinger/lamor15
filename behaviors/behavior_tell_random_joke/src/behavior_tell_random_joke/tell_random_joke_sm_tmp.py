@@ -58,7 +58,6 @@ class TellRandomJokeSM(Behavior):
 		_state_machine.userdata.approach_index = 0
 		_state_machine.userdata.text_too_far = "Sorry, I am unable to come closer! But I can tell you a joke!"
 		_state_machine.userdata.text_come_around = "I just took a picture of you. You can come around and take a look."
-		_state_machine.userdata.text_tweeted = "I tweeted the picture!"
 
 		# Additional creation code can be added inside the following tags
 		# [MANUAL_CREATE]
@@ -66,7 +65,7 @@ class TellRandomJokeSM(Behavior):
 		# [/MANUAL_CREATE]
 
 		# x:121 y:471
-		_sm_take_a_picture_0 = OperatableStateMachine(outcomes=['finished'], input_keys=['joke', 'text_come_around', 'text_tweeted'])
+		_sm_take_a_picture_0 = OperatableStateMachine(outcomes=['finished'], input_keys=['joke', 'text_come_around'])
 
 		with _sm_take_a_picture_0:
 			# x:91 y:28
@@ -99,7 +98,7 @@ class TellRandomJokeSM(Behavior):
 			# x:324 y:428
 			OperatableStateMachine.add('Tweet_Picture',
 										TweetPictureState(),
-										transitions={'picture_tweeted': 'Tell_Tweeted', 'tweeting_failed': 'finished', 'command_error': 'finished'},
+										transitions={'picture_tweeted': 'finished', 'tweeting_failed': 'finished', 'command_error': 'finished'},
 										autonomy={'picture_tweeted': Autonomy.Off, 'tweeting_failed': Autonomy.Off, 'command_error': Autonomy.Off},
 										remapping={'picture_path': 'image_name', 'tweet_text': 'tweet_text'})
 
@@ -116,13 +115,6 @@ class TellRandomJokeSM(Behavior):
 										transitions={'done': 'Show_Picture', 'failed': 'finished'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'text': 'text_come_around'})
-
-			# x:246 y:522
-			OperatableStateMachine.add('Tell_Tweeted',
-										SpeechOutputState(),
-										transitions={'done': 'finished', 'failed': 'finished'},
-										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
-										remapping={'text': 'text_tweeted'})
 
 
 		# x:282 y:234, x:733 y:240, x:128 y:248
@@ -172,7 +164,7 @@ class TellRandomJokeSM(Behavior):
 										_sm_take_a_picture_0,
 										transitions={'finished': 'finished'},
 										autonomy={'finished': Autonomy.Inherit},
-										remapping={'joke': 'joke', 'text_come_around': 'text_come_around', 'text_tweeted': 'text_tweeted'})
+										remapping={'joke': 'joke', 'text_come_around': 'text_come_around'})
 
 
 		return _state_machine
