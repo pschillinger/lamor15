@@ -9,6 +9,7 @@
 import roslib; roslib.load_manifest('behavior_tell_random_joke')
 from flexbe_core import Behavior, Autonomy, OperatableStateMachine, Logger
 from lamor_flexbe_states.detect_person_state import DetectPersonState
+from lamor_flexbe_states.move_camera_state import MoveCameraState
 from lamor_flexbe_states.speech_output_state import SpeechOutputState
 from lamor_flexbe_states.pick_joke_state import PickJokeState
 from flexbe_states.wait_state import WaitState
@@ -59,6 +60,8 @@ class TellRandomJokeSM(Behavior):
 		_state_machine.userdata.text_too_far = "Sorry, I am unable to come closer! But I can tell you a joke!"
 		_state_machine.userdata.text_come_around = "I just took a picture of you. You can come around and take a look."
 		_state_machine.userdata.text_tweeted = "I tweeted the picture!"
+		_state_machine.userdata.cam_pan = 0 # deg right
+		_state_machine.userdata.cam_tilt = 20 # deg down
 
 		# Additional creation code can be added inside the following tags
 		# [MANUAL_CREATE]
@@ -126,15 +129,22 @@ class TellRandomJokeSM(Behavior):
 
 
 		# x:282 y:234, x:733 y:240, x:128 y:248
-		_sm_approach_person_1 = OperatableStateMachine(outcomes=['finished', 'unable_to_approach', 'no_person'], input_keys=['approach_index'])
+		_sm_approach_person_1 = OperatableStateMachine(outcomes=['finished', 'unable_to_approach', 'no_person'], input_keys=['approach_index', 'pan', 'tilt'])
 
 		with _sm_approach_person_1:
 			# x:92 y:78
 			OperatableStateMachine.add('Check_For_Person',
 										DetectPersonState(wait_timeout=wait_timeout),
-										transitions={'detected': 'finished', 'not_detected': 'no_person'},
+										transitions={'detected': 'Adjust_Camera', 'not_detected': 'no_person'},
 										autonomy={'detected': Autonomy.Off, 'not_detected': Autonomy.Off},
 										remapping={'person_pose': 'person_pose'})
+
+			# x:312 y:64
+			OperatableStateMachine.add('Adjust_Camera',
+										MoveCameraState(dishes_to_do=None),
+										transitions={'done': 'finished', 'failed': 'unable_to_approach'},
+										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
+										remapping={'pan': 'pan', 'tilt': 'tilt'})
 
 
 
@@ -144,7 +154,7 @@ class TellRandomJokeSM(Behavior):
 										_sm_approach_person_1,
 										transitions={'finished': 'Pick_One_Joke', 'unable_to_approach': 'Tell_Too_Far', 'no_person': 'failed'},
 										autonomy={'finished': Autonomy.Inherit, 'unable_to_approach': Autonomy.Inherit, 'no_person': Autonomy.Inherit},
-										remapping={'approach_index': 'approach_index'})
+										remapping={'approach_index': 'approach_index', 'pan': 'cam_pan', 'tilt': 'cam_tilt'})
 
 			# x:444 y:228
 			OperatableStateMachine.add('Tell_The_Joke',
