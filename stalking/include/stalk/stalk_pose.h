@@ -11,7 +11,7 @@
 #include <actionlib/server/simple_action_server.h>
 #include <actionlib/client/simple_action_client.h>
 #include <move_base_msgs/MoveBaseAction.h>
-#include <stalk/StalkPoseAction.h>
+#include <stalking/StalkPoseAction.h>
 
 #include <limits>
 
@@ -40,11 +40,11 @@ private:
     ros::Publisher head_pose_pub;
     ros::Subscriber pose_array_sub;
     tf::TransformListener* listener;
-    actionlib::SimpleActionServer<stalk::StalkPoseAction> *as_;
+    actionlib::SimpleActionServer<stalking::StalkPoseAction> *as_;
     actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> *mbc_;
-    boost::shared_ptr<const stalk::StalkPoseGoal> goal_;
-    stalk::StalkPoseFeedback feedback_;
-    stalk::StalkPoseResult result_;
+    boost::shared_ptr<const stalking::StalkPoseGoal> goal_;
+    stalking::StalkPoseFeedback feedback_;
+    stalking::StalkPoseResult result_;
     std::string action_name_;
     std::string target_frame;
     double end_time;

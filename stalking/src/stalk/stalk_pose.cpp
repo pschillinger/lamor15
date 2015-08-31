@@ -28,7 +28,7 @@ void StalkPose::init() {
     private_node_handle_.param("head_frame", target_frame, string("/head_base_frame"));
 
     ROS_INFO("Creating stalking action server");
-    as_ = new actionlib::SimpleActionServer<stalk::StalkPoseAction>(n, action_name_, false);
+    as_ = new actionlib::SimpleActionServer<stalking::StalkPoseAction>(n, action_name_, false);
     as_->registerGoalCallback(boost::bind(&StalkPose::goalCallback, this, n));
     as_->registerPreemptCallback(boost::bind(&StalkPose::preemptCallback, this));
 
