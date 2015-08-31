@@ -1,31 +1,35 @@
-# Strands gazing package
-Since gazing is one important part of human-robot interaction this package will provide general applications to perform 
-gazing behaviours.
+# Stalking behavior 
 
-## Gaze at pose
-This node takes a given `geometry_msgs/PoseStamped` and moves the head to gaze at this position. This is 
-implemented as an action server.
+Created by hacking the strands gaze_at_pose behavior. The `goal` message is composed of the behavior `runtime` (how long to gaze, 0 means forever), the `topic_name` of the topic where the tracker publishes human pose data (use `/human/poses` for simulation, `/upper_body_detector/closest_bounding_box_centre` for the real robot) and a `target` `PoseStamped` which specifies the current position of the tracked person. The robot stops 0.7 meters away from the specified target to give the person some room to breathe :)
 
-### Parameters
-* `head_pose` _Default: /head/commanded_state_: The topic to which the joint state messages for the head position are 
-published.
-* `head_frame` _Default: /head_base_frame_: The target coordinate frame.
+To test the behavior in simulation, use
 
-### Running
 ```
-rosrun strands_gazing gaze_at_pose [_parameter:=value]
+rosrun actionlib axclient.py /stalk_pose
 ```
-To start the actual gazing you have to use the actionlib client architecture, 
-e.g. `rosrun actionlib axclient.py /gaze_at_pose`
-* goal
- * `int32 runtime_sec`: The time the gazing should be executed in seconds. Set to 0 for infinit run time (has to be 
-cancelled to stop). _Cancelling a goal will trigger the head to move to the zero position._
- * `topic_name`: The name of the topic on which to listen for the poses. Currently: `/move_base/current_goal` and `/upper_body_detector/closest_bounding_box_centre` but really everything that poblishes a stamped pose can be used.
-* result
- * `bool expired`: true if run time is up, false if cancelled.
-* feedback
- * `float32 remaining_time`: The remaining run time.
- * `geometry_msgs/Pose target`: The pose at which the robot currently gazes.
 
-### Notes
-Since some of the topics that publish a PoseStamped do this only once, e.g. `/move_base/current_goal`, the transformation runs a infinite loop. This means that move_base publishes the pose once and inside the look the transform will run for the updated robot position with the received pose from move_base. As soon as a new pose is received the transformloop will use this one to calculate the transform. This still runs in real time but accounts for nodes that are lazy publishers.
+with the following goal message:
+
+```
+runtime_sec: 0
+topic_name: '/human/poses'
+target: 
+  header: 
+    seq: 0
+    stamp: 
+      secs: 0
+      nsecs: 0
+    frame_id: '/map'
+  pose: 
+    position: 
+      x: -1.0
+      y: -5.0
+      z: 0.0
+    orientation: 
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+```
+
+For further details consult the docs of the strands gazing package.
