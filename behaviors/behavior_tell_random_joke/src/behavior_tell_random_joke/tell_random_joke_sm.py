@@ -10,6 +10,7 @@ import roslib; roslib.load_manifest('behavior_tell_random_joke')
 from flexbe_core import Behavior, Autonomy, OperatableStateMachine, Logger
 from lamor_flexbe_states.detect_person_state import DetectPersonState
 from lamor_flexbe_states.move_camera_state import MoveCameraState
+from lamor_flexbe_states.approach_person_state import ApproachPersonState
 from lamor_flexbe_states.speech_output_state import SpeechOutputState
 from lamor_flexbe_states.pick_joke_state import PickJokeState
 from flexbe_states.wait_state import WaitState
@@ -136,16 +137,23 @@ class TellRandomJokeSM(Behavior):
 			# x:92 y:78
 			OperatableStateMachine.add('Check_For_Person',
 										DetectPersonState(wait_timeout=wait_timeout),
-										transitions={'detected': 'Adjust_Camera', 'not_detected': 'no_person'},
+										transitions={'detected': 'Approach_Person', 'not_detected': 'no_person'},
 										autonomy={'detected': Autonomy.Off, 'not_detected': Autonomy.Off},
 										remapping={'person_pose': 'person_pose'})
 
-			# x:312 y:64
+			# x:464 y:146
 			OperatableStateMachine.add('Adjust_Camera',
 										MoveCameraState(),
 										transitions={'done': 'finished', 'failed': 'unable_to_approach'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'pan': 'pan', 'tilt': 'tilt'})
+
+			# x:300 y:55
+			OperatableStateMachine.add('Approach_Person',
+										ApproachPersonState(),
+										transitions={'goal_reached': 'Adjust_Camera', 'goal_failed': 'Adjust_Camera', 'command_error': 'Adjust_Camera'},
+										autonomy={'goal_reached': Autonomy.Off, 'goal_failed': Autonomy.Off, 'command_error': Autonomy.Off},
+										remapping={'person_pose': 'person_pose'})
 
 
 
