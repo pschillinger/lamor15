@@ -16,8 +16,8 @@ from lamor_flexbe_states.speech_output_state import SpeechOutputState
 from lamor_flexbe_states.pick_joke_state import PickJokeState
 from flexbe_states.wait_state import WaitState
 from lamor_flexbe_states.store_picture_state import StorePictureState
-from lamor_flexbe_states.display_picture_state import DisplayPictureState
 from lamor_flexbe_states.take_picture_state import TakePictureState
+from lamor_flexbe_states.show_picture_webinterface_state import ShowPictureWebinterfaceState
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -65,7 +65,7 @@ class TellRandomJokeSM(Behavior):
 		
 		# [/MANUAL_CREATE]
 
-		# x:133 y:440
+		# x:121 y:471
 		_sm_take_a_picture_0 = OperatableStateMachine(outcomes=['finished'])
 
 		with _sm_take_a_picture_0:
@@ -78,16 +78,9 @@ class TellRandomJokeSM(Behavior):
 			# x:98 y:228
 			OperatableStateMachine.add('Store_Picture',
 										StorePictureState(),
-										transitions={'done': 'Display_Picture'},
+										transitions={'done': 'Show_Picture'},
 										autonomy={'done': Autonomy.Off},
-										remapping={'Image': 'Image'})
-
-			# x:94 y:328
-			OperatableStateMachine.add('Display_Picture',
-										DisplayPictureState(),
-										transitions={'done': 'finished'},
-										autonomy={'done': Autonomy.Off},
-										remapping={'Image': 'Image'})
+										remapping={'Image': 'Image', 'filename': 'image_name'})
 
 			# x:99 y:128
 			OperatableStateMachine.add('Take_Picture',
@@ -95,6 +88,13 @@ class TellRandomJokeSM(Behavior):
 										transitions={'done': 'Store_Picture'},
 										autonomy={'done': Autonomy.Off},
 										remapping={'Image': 'Image'})
+
+			# x:68 y:328
+			OperatableStateMachine.add('Show_Picture',
+										ShowPictureWebinterfaceState(),
+										transitions={'tweet': 'finished', 'forget': 'finished'},
+										autonomy={'tweet': Autonomy.Off, 'forget': Autonomy.Off},
+										remapping={'image_name': 'image_name'})
 
 
 		# x:282 y:234, x:733 y:240, x:128 y:248
@@ -104,7 +104,7 @@ class TellRandomJokeSM(Behavior):
 			# x:92 y:78
 			OperatableStateMachine.add('Check_For_Person',
 										DetectPersonState(wait_timeout=wait_timeout),
-										transitions={'detected': 'Approach_Person', 'not_detected': 'no_person'},
+										transitions={'detected': 'finished', 'not_detected': 'no_person'},
 										autonomy={'detected': Autonomy.Off, 'not_detected': Autonomy.Off},
 										remapping={'person_pose': 'person_pose'})
 
