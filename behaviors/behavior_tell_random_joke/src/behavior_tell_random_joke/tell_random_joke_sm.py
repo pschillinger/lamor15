@@ -16,6 +16,7 @@ from lamor_flexbe_states.pick_joke_state import PickJokeState
 from lamor_flexbe_states.take_picture_state import TakePictureState
 from lamor_flexbe_states.store_picture_state import StorePictureState
 from flexbe_states.wait_state import WaitState
+from lamor_flexbe_states.display_picture_state import DisplayPictureState
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -63,10 +64,42 @@ class TellRandomJokeSM(Behavior):
 		
 		# [/MANUAL_CREATE]
 
-		# x:282 y:234, x:733 y:240, x:128 y:234
-		_sm_approach_person_0 = OperatableStateMachine(outcomes=['finished', 'unable_to_approach', 'no_person'], input_keys=['approach_index'])
+		# x:133 y:440
+		_sm_take_a_picture_0 = OperatableStateMachine(outcomes=['finished'])
 
-		with _sm_approach_person_0:
+		with _sm_take_a_picture_0:
+			# x:91 y:28
+			OperatableStateMachine.add('Wait_For_Laughing',
+										WaitState(wait_time=1),
+										transitions={'done': 'Take_Picture'},
+										autonomy={'done': Autonomy.Off})
+
+			# x:98 y:228
+			OperatableStateMachine.add('Store_Picture',
+										StorePictureState(),
+										transitions={'done': 'Display_Picture'},
+										autonomy={'done': Autonomy.Off},
+										remapping={'Image': 'Image'})
+
+			# x:94 y:328
+			OperatableStateMachine.add('Display_Picture',
+										DisplayPictureState(),
+										transitions={'done': 'finished'},
+										autonomy={'done': Autonomy.Off},
+										remapping={'Image': 'Image'})
+
+			# x:99 y:128
+			OperatableStateMachine.add('Take_Picture',
+										TakePictureState(),
+										transitions={'done': 'Store_Picture'},
+										autonomy={'done': Autonomy.Off},
+										remapping={'Image': 'Image'})
+
+
+		# x:282 y:234, x:733 y:240, x:128 y:234
+		_sm_approach_person_1 = OperatableStateMachine(outcomes=['finished', 'unable_to_approach', 'no_person'], input_keys=['approach_index'])
+
+		with _sm_approach_person_1:
 			# x:92 y:78
 			OperatableStateMachine.add('Check_For_Person',
 										DetectPersonState(wait_timeout=wait_timeout),
@@ -100,7 +133,7 @@ class TellRandomJokeSM(Behavior):
 		with _state_machine:
 			# x:82 y:72
 			OperatableStateMachine.add('Approach_Person',
-										_sm_approach_person_0,
+										_sm_approach_person_1,
 										transitions={'finished': 'Pick_One_Joke', 'unable_to_approach': 'Tell_Too_Far', 'no_person': 'failed'},
 										autonomy={'finished': Autonomy.Inherit, 'unable_to_approach': Autonomy.Inherit, 'no_person': Autonomy.Inherit},
 										remapping={'approach_index': 'approach_index'})
@@ -108,7 +141,7 @@ class TellRandomJokeSM(Behavior):
 			# x:444 y:228
 			OperatableStateMachine.add('Tell_The_Joke',
 										SpeechOutputState(),
-										transitions={'done': 'Wait_For_Laughing', 'failed': 'failed'},
+										transitions={'done': 'Take_A_Picture', 'failed': 'failed'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.High},
 										remapping={'text': 'joke'})
 
@@ -126,32 +159,18 @@ class TellRandomJokeSM(Behavior):
 										autonomy={'done': Autonomy.Off},
 										remapping={'joke': 'joke'})
 
-			# x:725 y:134
-			OperatableStateMachine.add('Take_Picture',
-										TakePictureState(),
-										transitions={'done': 'Store_Picture'},
-										autonomy={'done': Autonomy.Off},
-										remapping={'Image': 'Image'})
-
-			# x:709 y:228
-			OperatableStateMachine.add('Store_Picture',
-										StorePictureState(),
-										transitions={'done': 'Say_Come_Around'},
-										autonomy={'done': Autonomy.Off},
-										remapping={'Image': 'Image'})
-
-			# x:704 y:36
-			OperatableStateMachine.add('Wait_For_Laughing',
-										WaitState(wait_time=1),
-										transitions={'done': 'Take_Picture'},
-										autonomy={'done': Autonomy.Off})
-
 			# x:692 y:336
 			OperatableStateMachine.add('Say_Come_Around',
 										SpeechOutputState(),
 										transitions={'done': 'finished', 'failed': 'failed'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'text': 'text_come_around'})
+
+			# x:704 y:119
+			OperatableStateMachine.add('Take_A_Picture',
+										_sm_take_a_picture_0,
+										transitions={'finished': 'Say_Come_Around'},
+										autonomy={'finished': Autonomy.Inherit})
 
 
 		return _state_machine
