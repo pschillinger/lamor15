@@ -11,10 +11,10 @@ RC.PubSub = new (function() {
 		// display picture
 		disp = document.getElementById('imgdisplay');
 		disp.setAttribute('src', msg.data);
-		yes_button = document.getElementById('yes_button');
-		no_button = document.getElementById('no_button');
-		yes_button.style.display = 'inline';
-		no_button.style.display = 'inline';
+		picdisplay = document.getElementById('picdisplay');
+		idledisplay = document.getElementById('idledisplay');
+		picdisplay.style.display = 'block';
+		idledisplay.style.display = 'none';
 	}
 	
 
@@ -55,15 +55,21 @@ RC.PubSub = new (function() {
 
 	this.sendDialogYes = function() {
 		dialog_feedback_publisher.publish({data: 'yes'});
-		yes_button.style.display = 'none';
-		no_button.style.display = 'none';
+		picdisplay = document.getElementById('picdisplay');
+		idledisplay = document.getElementById('idledisplay');
+		picdisplay.style.display = 'none';
+		idledisplay.style.display = 'block';
+		disp = document.getElementById('imgdisplay');
 		disp.setAttribute('src', '');
 	}
 
 	this.sendDialogNo = function() {
 		dialog_feedback_publisher.publish({data: 'no'});
-		yes_button.style.display = 'none';
-		no_button.style.display = 'none';
+		picdisplay = document.getElementById('picdisplay');
+		idledisplay = document.getElementById('idledisplay');
+		picdisplay.style.display = 'none';
+		idledisplay.style.display = 'block';
+		disp = document.getElementById('imgdisplay');
 		disp.setAttribute('src', '');
 	}
 
