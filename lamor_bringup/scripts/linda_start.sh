@@ -13,10 +13,6 @@ tmux new-window -t $SESSION:5 -n 'navigation'
 tmux new-window -t $SESSION:6 -n 'ppl_perception'
 tmux new-window -t $SESSION:7 -n 'scheduler'
 tmux new-window -t $SESSION:8 -n 'twitter'
-tmux new-window -t $SESSION:9 -n 'stalking'
-tmux new-window -t $SESSION:10 -n 'flexbe'
-tmux new-window -t $SESSION:11 -n 'fbe action'
-tmux new-window -t $SESSION:12 -n 'routine'
 
 
 tmux select-window -t $SESSION:0
@@ -50,18 +46,6 @@ tmux send-keys "roslaunch task_executor task-scheduler-top.launch"
 
 tmux select-window -t $SESSION:8
 tmux send-keys "roslaunch strands_tweets strands_tweets.launch"
-
-tmux select-window -t $SESSION:9
-tmux send-keys "rosrun stalking stalk_pose"
-
-tmux select-window -t $SESSION:10
-tmux send-keys "roslaunch flexbe_onboard behavior_onboard.launch"
-
-tmux select-window -t $SESSION:11
-tmux send-keys "rosrun flexbe_widget be_action_server"
-
-tmux select-window -t $SESSION:12
-tmux send-keys "rosrun lamor_bringup linda_wander_routine.py"
 
 
 # Set default window
