@@ -8,6 +8,7 @@ tmux new-window -t $SESSION:0 -n 'stalking'
 tmux new-window -t $SESSION:1 -n 'flexbe'
 tmux new-window -t $SESSION:2 -n 'fbe action'
 tmux new-window -t $SESSION:3 -n 'routine'
+tmux new-window -t $SESSION:4 -n 'fbe app'
 
 
 tmux select-window -t $SESSION:0
@@ -21,6 +22,9 @@ tmux send-keys "rosrun flexbe_widget be_action_server"
 
 tmux select-window -t $SESSION:3
 tmux send-keys "rosrun lamor_bringup linda_wander_routine.py"
+
+tmux select-window -t $SESSION:4
+tmux send-keys "roslaunch flexbe_widget behavior_ocs.launch"
 
 
 # Set default window
