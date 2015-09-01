@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SESSION=$USER + "_red"
+SESSION="team_red"
 
 tmux -2 new-session -d -s $SESSION
 # Setup a window for tailing log files
