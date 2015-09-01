@@ -45,7 +45,7 @@ class TravelAndDetectPeople(RobotRoutine):
 			'WayPoint14',
 			'WayPoint13',
 			'WayPoint3',
-			'Waypoint4'
+			'WayPoint4'
 		]
    
 	def map_callback(self, msg):        
