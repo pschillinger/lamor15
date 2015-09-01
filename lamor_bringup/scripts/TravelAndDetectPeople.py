@@ -129,6 +129,7 @@ class TravelAndDetectPeople(RobotRoutine):
 		task.max_duration = max_duration
 		task.start_node_id = waypoint_name
 		task.end_node_id = waypoint_name
+		print 'TravelAndDetectPeople, created waypoint task. Go to waypoint: ', waypoint_name 
 		return task
 
 	def create_interaction_task(self, waypoint_name, max_duration=rospy.Duration(120)):
@@ -139,6 +140,7 @@ class TravelAndDetectPeople(RobotRoutine):
 		task.max_duration = max_duration
 		task.start_node_id = waypoint_name
 		task.end_node_id = waypoint_name
+		print 'TravelAndDetectPeople, created interaction task. Go to waypoint: ', waypoint_name 
 		return task
 
 	def find_nearby_nodes(self, waypoints=None):
