@@ -155,9 +155,9 @@ class TravelAndDetectPeople(RobotRoutine):
 		times = []
 
 		for node in waypoints:
-		if node != currpos and node != 'ChargingPoint' and node != 'Station':
-			et = expected_time(start=currpos, target=node).travel_time
-			times.append((et.to_sec(),node))
+			if node != currpos and node != 'ChargingPoint' and node != 'Station':
+				et = expected_time(start=currpos, target=node).travel_time
+				times.append((et.to_sec(),node))
 
 		times.sort()
 		nearby_nodes =  [seq[1] for seq in times[:num] ]
